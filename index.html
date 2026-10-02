@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- Lệnh chặn trình duyệt tự động đổi sang màu tối -->
+    <meta name="color-scheme" content="only light">
+    <title>Xác Thực Thẻ Nhân Viên - Xuân Mai Urenco</title>
+    <style>
+        /* Ép buộc màu sắc gốc, chống Force Dark Mode trên Android/iOS */
+        :root {
+            color-scheme: light;
+            --green-primary: #00A859;
+            --blue-primary: #0072CE;
+            --navy-dark: #0A2540;
+            --bg-light: #F1F5F9;
+            --card-bg: #FFFFFF;
+            --text-main: #0F172A;
+            --text-sub: #475569;
+            --border-color: #E2E8F0;
+            --red-alert: #D9251D;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        
+        /* Bắt buộc nền xám nhạt và chữ đen đậm */
+        html, body { 
+            background-color: #F1F5F9 !important; 
+            color: #0F172A !important; 
+            display: flex; 
+            justify-content: center; 
+            padding: 6px 4px; 
+            min-height: 100vh; 
+        }
+
+        .app-card {
+            width: 100%;
+            max-width: 430px;
+            background-color: #FFFFFF !important;
+            border-radius: 16px;
+            box-shadow: 0 8px 25px rgba(15, 23, 42, 0.1);
+            border: 1px solid #E2E8F0 !important;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 1. Thanh Cảnh báo Chống Giả danh */
+        .alert-bar {
+            background-color: #FEF2F2 !important;
+            border-bottom: 1px solid #FECACA !important;
+            padding: 8px 10px;
+            font-size: 11px;
+            color: #991B1B !important;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-weight: 700;
+        }
+        .btn-hotline {
+            color: #FFFFFF !important;
+            background-color: #D9251D !important;
+            padding: 4px 10px;
+            border-radius: 14px;
+            text-decoration: none;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        /* 2. Header Nằm Ngang (Logo trái - Chữ phải) */
+        .brand-header {
+            background-color: #FFFFFF !important;
+            padding: 12px 10px;
+            border-bottom: 3px solid #00A859 !important;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .logo-img {
+            width: 90px;
+            height: auto;
+            flex-shrink: 0;
+            display: block;
+        }
+        .header-text-group {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .company-name {
+            font-size: 13px;
+            font-weight: 900;
+            color: #0A2540 !important;
+            text-transform: uppercase;
+            line-height: 1.3;
+        }
+        .verify-tag {
+            display: inline-flex;
+            align-items: center;
+            background-color: #E6F7ED !important;
+            color: #00A859 !important;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 800;
+            margin-top: 4px;
+            align-self: flex-start;
+        }
+
+        /* 3. Navigation Tabs */
+        .nav-tabs {
+            display: flex;
+            background-color: #E2E8F0 !important;
+            padding: 4px;
+            gap: 4px;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            font-size: 12px;
+            font-weight: 700;
+            color: #475569 !important;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .tab-btn.active {
+            background-color: #FFFFFF !important;
+            color: #0072CE !important;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+
+        /* 4. Tab Contents */
+        .content-area { 
+            display: none; 
+            padding: 14px; 
+            background-color: #FFFFFF !important; 
+        }
+        .content-area.active { display: block; animation: fadeIn 0.2s ease-in-out; }
+
+        /* Card Thông tin Nhân viên */
+        .profile-box {
+            background-color: #FFFFFF !important;
+            border: 1px solid #E2E8F0 !important;
+            border-radius: 12px;
+            padding: 14px;
+            position: relative;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+        }
+
+        .photo-container {
+            width: 125px;
+            height: 160px;
+            margin: 0 auto 10px;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 3px solid #00A859 !important;
+            box-shadow: 0 6px 12px rgba(0,168,89,0.15);
+            background-color: #F1F5F9 !important;
+        }
+        .photo-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .employee-name {
+            font-size: 20px;
+            font-weight: 900;
+            color: #0A2540 !important;
+            text-align: center;
+            text-transform: uppercase;
+        }
+        .employee-title {
+            font-size: 11.5px;
+            font-weight: 800;
+            color: #00A859 !important;
+            text-align: center;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            background-color: #F0F9FF !important;
+            color: #0072CE !important;
+            border: 1px solid #BAE6FD !important;
+            padding: 5px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 800;
+            margin-bottom: 12px;
+        }
+        .dot-pulse {
+            width: 8px;
+            height: 8px;
+            background-color: #0072CE !important;
+            border-radius: 50%;
+            animation: pulseAnim 1.5s infinite;
+        }
+
+        .info-table {
+            background-color: #F8FAFC !important;
+            border: 1px solid #E2E8F0 !important;
+            border-radius: 10px;
+            padding: 8px 12px;
+            font-size: 12px;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 7px 0;
+            border-bottom: 1px dashed #CBD5E1 !important;
+        }
+        .info-row:last-child { border-bottom: none; }
+        .lbl { color: #475569 !important; font-weight: 500; }
+        .val { font-weight: 700; color: #0F172A !important; text-align: right; }
+
+        /* Con dấu đỏ điện tử */
+        .stamp-seal {
+            position: absolute;
+            right: 8px;
+            bottom: 70px;
+            width: 90px;
+            height: 90px;
+            border: 2px dashed #D9251D !important;
+            border-radius: 50%;
+            color: #D9251D !important;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 8px;
+            font-weight: 900;
+            transform: rotate(-15deg);
+            opacity: 0.85;
+            pointer-events: none;
+            background-color: rgba(217,37,29,0.02) !important;
+            line-height: 1.1;
+            padding: 2px;
+        }
+
+        /* Khối Quyết định nhanh Tab 1 */
+        .quick-doc-box {
+            margin-top: 10px;
+            background-color: #F0FDF4 !important;
+            border: 1px solid #BBF7D0 !important;
+            padding: 8px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        /* Tab Bảng Giá Pháp Lý */
+        .legal-box {
+            background-color: #F8FAFC !important;
+            border: 1px solid #E2E8F0 !important;
+            border-radius: 12px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        .legal-title { font-size: 13px; font-weight: 800; color: #0A2540 !important; margin-bottom: 6px; }
+        .legal-desc { font-size: 11px; color: #475569 !important; margin-bottom: 8px; line-height: 1.4; }
+
+        .tariff-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+            background-color: #FFFFFF !important;
+        }
+        .tariff-table th, .tariff-table td {
+            border: 1px solid #CBD5E1 !important;
+            padding: 6px 4px;
+            text-align: center;
+            color: #0F172A !important;
+        }
+        .tariff-table th { background-color: #E2E8F0 !important; color: #0A2540 !important; font-weight: 700; }
+        .tariff-table td.left-align { text-align: left; font-weight: 600; padding-left: 6px; }
+        .tariff-table .highlight { background-color: #E0F2FE !important; font-weight: 700; color: #0369A1 !important; }
+
+        /* Nút hành động CTA */
+        .cta-group { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+        .btn-cta {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 11px;
+            border-radius: 10px;
+            font-size: 12.5px;
+            font-weight: 800;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            color: #FFFFFF !important;
+        }
+        .btn-call-now { background-color: #D9251D !important; box-shadow: 0 4px 10px rgba(217,37,29,0.2); }
+        .btn-share-zalo { background-color: #0068FF !important; }
+        .btn-open-drive { background-color: #16A34A !important; }
+        .btn-open-drive-dark { background-color: #475569 !important; }
+
+        .footer-text {
+            text-align: center;
+            padding: 12px;
+            font-size: 11px;
+            color: #64748B !important;
+            background-color: #F8FAFC !important;
+            border-top: 1px solid #E2E8F0 !important;
+        }
+
+        @keyframes pulseAnim {
+            0% { box-shadow: 0 0 0 0 rgba(0,114,206,0.5); }
+            70% { box-shadow: 0 0 0 8px rgba(0,114,206,0); }
+            100% { box-shadow: 0 0 0 0 rgba(0,114,206,0); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-card">
+    <!-- 1. Thanh Cảnh báo Giả danh -->
+    <div class="alert-bar">
+        <span>🛡️ CẢNH BÁO PHÒNG GIẢ DANH</span>
+        <a href="tel:0976538942" class="btn-hotline">📞 0976.538.942</a>
+    </div>
+
+    <!-- 2. Header Nằm Ngang Tối Ưu Diện Tích -->
+    <div class="brand-header">
+        <img src="https://lh3.googleusercontent.com/d/1Lljwh_PfM9-j5P46Mki7zXuIXOs4kU4o" alt="Logo Xuân Mai Urenco" class="logo-img">
+        <div class="header-text-group">
+            <div class="company-name">CÔNG TY MÔI TRƯỜNG ĐÔ THỊ XUÂN MAI</div>
+            <div class="verify-tag">✓ XÁC THỰC DANH TÍNH CHÍNH THỨC</div>
+        </div>
+    </div>
+
+    <!-- 3. Thanh Chuyển Tab -->
+    <div class="nav-tabs">
+        <button class="tab-btn active" onclick="switchTab('tab-card', this)">
+            🪪 THẺ NHÂN VIÊN
+        </button>
+        <button class="tab-btn" onclick="switchTab('tab-legal', this)">
+            ⚖️ ĐƠN GIÁ UBND & QĐ
+        </button>
+    </div>
+
+    <!-- 4. TAB 1: THẺ NHÂN VIÊN -->
+    <div id="tab-card" class="content-area active">
+        <div class="profile-box">
+            <!-- Con dấu điện tử đỏ -->
+            <div class="stamp-seal">
+                CÔNG TY MTĐT<br>XUÂN MAI<br>★ ★ ★<br>ĐÃ XÁC THỰC
+            </div>
+
+            <!-- Ảnh chân dung nhân viên mới -->
+            <div class="photo-container">
+                <img src="https://lh3.googleusercontent.com/d/1G7mVdnQWHjGLTReKJQhCqXcCiADAGq7g" alt="Nhân viên Quốc Oai">
+            </div>
+
+            <!-- CHÚ Ý: BẠN HÃY THAY TÊN NHÂN VIÊN Ở ĐÂY -->
+            <div class="employee-name">[NHẬP TÊN NHÂN VIÊN]</div>
+            <div class="employee-title">NHÂN VIÊN CSKH VÀ THU GIÁ VSMT</div>
+
+            <div class="status-badge">
+                <span class="dot-pulse"></span>
+                THẺ ĐANG HOẠT ĐỘNG CHÍNH THỨC
+            </div>
+
+            <div class="info-table">
+                <div class="info-row">
+                    <span class="lbl">Địa bàn phụ trách:</span>
+                    <span class="val" style="color: #0072CE !important;">XÃ QUỐC OAI</span>
+                </div>
+                <div class="info-row">
+                    <span class="lbl">Mã số nhân viên:</span>
+                    <!-- CHÚ Ý: BẠN HÃY THAY MÃ NHÂN VIÊN Ở ĐÂY -->
+                    <span class="val">[MÃ NV]</span>
+                </div>
+                <div class="info-row">
+                    <span class="lbl">QĐ Giao nhiệm vụ:</span>
+                    <span class="val">123/TB-MTĐT</span>
+                </div>
+                <div class="info-row">
+                    <span class="lbl">Người ký duyệt QĐ:</span>
+                    <span class="val">GĐ. Nguyễn Ngọc Oanh</span>
+                </div>
+                <div class="info-row">
+                    <span class="lbl">Mã phiên xác thực:</span>
+                    <span class="val" id="session-id">XM-13000</span>
+                </div>
+            </div>
+
+            <!-- Xem nhanh Quyết định giao việc của Công ty -->
+            <div class="quick-doc-box">
+                <div style="font-size: 11px; font-weight: 700; color: #15803D !important; margin-bottom: 6px;">
+                    📄 Quyết Định Giao Việc Xã Quốc Oai
+                </div>
+                <a href="https://drive.google.com/file/d/15Z3bWUCdkk8SwMLA-1CYYyT8KSBz4RF_/view?usp=drive_link" target="_blank" class="btn-cta btn-open-drive" style="padding: 8px; font-size: 12px;">
+                    👁️ Xem Bản Mộc Đỏ Đính Kèm
+                </a>
+            </div>
+        </div>
+
+        <div class="cta-group">
+            <a href="tel:0976538942" class="btn-cta btn-call-now">
+                📞 Hotline 0976.538.942 Xác Minh Trực Tiếp
+            </a>
+            <button onclick="shareLinkZalo()" class="btn-cta btn-share-zalo">
+                💬 Gửi Link Xác Thực Qua Zalo Khách Hàng
+            </button>
+        </div>
+    </div>
+
+    <!-- 5. TAB 2: ĐƠN GIÁ UBND HÀ NỘI ĐẦY ĐỦ 2026 - 2027 -->
+    <div id="tab-legal" class="content-area">
+        <div class="legal-box">
+            <div class="legal-title">📄 Đơn Giá QĐ 4996/QĐ-UBND Hà Nội</div>
+            <div class="legal-desc">Mức giá cụ thể dịch vụ thu gom, vận chuyển, xử lý rác thải sinh hoạt 2026 - 2027:</div>
+
+            <table class="tariff-table">
+                <thead>
+                    <tr>
+                        <th rowspan="2">Đối tượng</th>
+                        <th colspan="2">Năm 2026 (đồng/người/tháng)</th>
+                        <th colspan="2">Năm 2027 (đồng/người/tháng)</th>
+                    </tr>
+                    <tr>
+                        <th>Quý I, II</th>
+                        <th>Quý III, IV</th>
+                        <th>Quý I, II</th>
+                        <th>Quý III, IV</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="highlight">
+                        <td class="left-align">Hộ tại PHƯỜNG</td>
+                        <td>10.000</td>
+                        <td>15.000</td>
+                        <td>21.000</td>
+                        <td>30.000</td>
+                    </tr>
+                    <tr>
+                        <td class="left-align">Hộ tại XÃ</td>
+                        <td>8.000</td>
+                        <td>10.000</td>
+                        <td>13.000</td>
+                        <td>17.000</td>
+                    </tr>
+                    <tr>
+                        <td class="left-align">Kinh doanh, tổ chức</td>
+                        <td colspan="4"><b>1.175 đ/kg</b> x Khối lượng phát sinh</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="legal-box">
+            <div class="legal-title">📁 Văn Bản Mộc Đỏ Lưu Trữ</div>
+            <div class="legal-desc">Bản quét văn bản gốc lưu trực tiếp trên Google Drive:</div>
+
+            <div class="cta-group">
+                <a href="https://drive.google.com/file/d/1K1FPlQnhF8rbh3fOjaspR0cmbBEo285i/view?usp=drivesdk" target="_blank" class="btn-cta btn-open-drive">
+                    ☁️ Mở File QĐ 4996 Đơn Giá Hà Nội
+                </a>
+                <a href="https://drive.google.com/file/d/1V_uKhy5ouqsg6cZjMoNz_L0YJfbGuE0s/view?usp=drive_link" target="_blank" class="btn-cta btn-open-drive-dark">
+                    📄 Mở File QĐ Giao Thu Của UBND Xã Quốc Oai
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 6. Footer -->
+    <div class="footer-text">
+        <b>CÔNG TY MÔI TRƯỜNG ĐÔ THỊ XUÂN MAI</b><br>
+        Địa chỉ: Xã Xuân Mai, TP. Hà Nội<br>
+        Đường dây nóng phản ánh dịch vụ: <b>0976.538.942</b>
+    </div>
+</div>
+
+<!-- ĐOẠN SCRIPT QUAN TRỌNG ĐÃ ĐƯỢC GỘP CHUẨN XÁC -->
+<script>
+    // Hàm chuyển Tab
+    function switchTab(tabId, btn) {
+        document.querySelectorAll('.content-area').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+
+        document.getElementById(tabId).classList.add('active');
+        btn.classList.add('active');
+    }
+
+    // Sinh mã phiên bảo mật ngẫu nhiên
+    document.getElementById('session-id').innerText = 'XM-' + Math.floor(10000 + Math.random() * 90000);
+
+    // Hàm gọi chức năng chia sẻ chuẩn Zalo
+    function shareLinkZalo() {
+        var shareData = {
+            title: 'Xác thực Thẻ Nhân viên - Xuân Mai Urenco',
+            text: 'Thẻ nhân viên điện tử & Văn bản phân công nhiệm vụ - Công ty MTĐT Xuân Mai',
+            url: window.location.href
+        };
+
+        if (navigator.share) {
+            navigator.share(shareData)
+                .then(() => console.log('Mở bảng chia sẻ thành công'))
+                .catch((err) => console.log('Lỗi chia sẻ:', err));
+        } else {
+            // Dự phòng nếu điện thoại cũ không hỗ trợ
+            navigator.clipboard.writeText(window.location.href).then(function() {
+                alert('Đã sao chép link! Bạn có thể mở Zalo và dán vào tin nhắn cho khách hàng.');
+            }, function() {
+                window.location.href = "https://zalo.me/share?url=" + encodeURIComponent(window.location.href);
+            });
+        }
+    }
+</script>
+
+</body>
+</html>
